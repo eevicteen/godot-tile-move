@@ -1,0 +1,130 @@
+[gd_scene load_steps=17 format=3 uid="uid://bj8geusrv0xtp"]
+
+[ext_resource type="Texture2D" uid="uid://bou7fpjejs8ym" path="res://assets/character/down_0.png" id="1_hqtel"]
+[ext_resource type="Texture2D" uid="uid://cwf14gtqbiemk" path="res://assets/character/down_1.png" id="2_sweqy"]
+[ext_resource type="Texture2D" uid="uid://c37gb8f1lt6y1" path="res://assets/character/down_2.png" id="3_2hs0m"]
+[ext_resource type="Texture2D" uid="uid://8i6si3w0xw3a" path="res://assets/character/down_3.png" id="4_1jxqw"]
+[ext_resource type="Texture2D" uid="uid://dywob7pagpajm" path="res://assets/character/side_0.png" id="5_ivps1"]
+[ext_resource type="Texture2D" uid="uid://c0vucuewhfem7" path="res://assets/character/side_1.png" id="6_urp6f"]
+[ext_resource type="Texture2D" uid="uid://cvn5xpyhk2rti" path="res://assets/character/side_2.png" id="7_bwjto"]
+[ext_resource type="Texture2D" uid="uid://bdoyue3d6kd2" path="res://assets/character/side_3.png" id="8_606se"]
+[ext_resource type="Texture2D" uid="uid://c1by50nm588x0" path="res://assets/character/up_0.png" id="9_u1c27"]
+[ext_resource type="Texture2D" uid="uid://c32g5sspjedfq" path="res://assets/character/up_1.png" id="10_op7ga"]
+[ext_resource type="Texture2D" uid="uid://dxi0h10ggjqj2" path="res://assets/character/up_2.png" id="11_q13i1"]
+[ext_resource type="Texture2D" uid="uid://ht64ta3iryoq" path="res://assets/character/up_3.png" id="12_pylmc"]
+
+[sub_resource type="GDScript" id="GDScript_urp6f"]
+resource_name = "player"
+script/source = "extends Area2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+#NOTE::: CODE BELOW IS TEMPORARY TO SHOW ANIMATION
+@export var speed = 100
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	var velocity = Vector2.ZERO 
+	if Input.is_action_pressed(\"ui_right\"):
+		velocity.x += 1
+	if Input.is_action_pressed(\"ui_left\"):
+		velocity.x -= 1
+	if Input.is_action_pressed(\"ui_down\"):
+		velocity.y += 1
+	if Input.is_action_pressed(\"ui_up\"):
+		velocity.y -= 1
+		
+	if velocity.length() > 0:
+		velocity = velocity.normalized() * speed
+		$AnimatedSprite2D.play()
+	else:
+		$AnimatedSprite2D.stop()
+		
+	position += velocity * delta
+	
+	if velocity.x != 0:
+		$AnimatedSprite2D.animation = \"side\"
+		$AnimatedSprite2D.flip_v = false
+		$AnimatedSprite2D.flip_h = velocity.x < 0
+	elif velocity.y > 0:
+		$AnimatedSprite2D.animation = \"down\"
+	elif velocity.y < 0:
+		$AnimatedSprite2D.animation = \"up\"
+	
+"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_dw050"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_hqtel")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_sweqy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_2hs0m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_1jxqw")
+}],
+"loop": true,
+"name": &"down",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_ivps1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_urp6f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_bwjto")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_606se")
+}],
+"loop": true,
+"name": &"side",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_u1c27")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_op7ga")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_q13i1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_pylmc")
+}],
+"loop": true,
+"name": &"up",
+"speed": 8.0
+}]
+
+[sub_resource type="GDScript" id="GDScript_ivps1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ivps1"]
+size = Vector2(18, 24)
+
+[node name="player" type="Area2D"]
+position = Vector2(200, 200)
+scale = Vector2(3, 3)
+script = SubResource("GDScript_urp6f")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_dw050")
+animation = &"up"
+script = SubResource("GDScript_ivps1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_ivps1")
