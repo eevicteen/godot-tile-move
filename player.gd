@@ -38,8 +38,10 @@ func _process(delta: float) -> void:
 			move("up")
 	
 	if Input.is_action_just_pressed("ui_accept") and moving == false:
-		read_sign.emit(sign_cell_data.get_custom_data("sign_id"))
-		can_move=not can_move
+		if sign_cell_data:
+			var sign_id = sign_cell_data.get_custom_data("sign_id")
+			read_sign.emit(sign_id)
+			can_move=not can_move
 	
 	
 func stop_moving():
