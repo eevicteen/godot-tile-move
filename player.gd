@@ -1,4 +1,5 @@
 extends CharacterBody2D
+
 var moving = false
 var direction
 
@@ -92,3 +93,8 @@ func vector_to_animation_sprite(vec):
 		return("up")
 	else:
 		pass
+
+func teleport_to(new_pos: Vector2) -> void:
+	velocity = Vector2.ZERO   # stop movement
+	moving = false            # reset tween state
+	global_position = new_pos # directly place player
