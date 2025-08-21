@@ -95,6 +95,6 @@ func vector_to_animation_sprite(vec):
 		pass
 
 func teleport_to(new_pos: Vector2) -> void:
-	velocity = Vector2.ZERO   # stop movement
-	moving = false            # reset tween state
-	global_position = new_pos # directly place player
+	velocity = Vector2.ZERO   
+	moving = false            
+	global_position = new_pos 
