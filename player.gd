@@ -2,6 +2,7 @@ extends CharacterBody2D
 
 var moving = false
 var direction
+var input_locked := false
 
 var path_layer : TileMapLayer
 var wall_layer : TileMapLayer
@@ -19,6 +20,8 @@ func _ready() -> void:
 	sign_layer = get_node("../TileMap/SignIDLayer")
 
 func _process(delta: float) -> void:
+	if input_locked:
+		return   
 	direction = Vector2i.ZERO
 	current_cell = wall_layer.local_to_map(position)
 	
@@ -95,6 +98,7 @@ func vector_to_animation_sprite(vec):
 		pass
 
 func teleport_to(new_pos: Vector2) -> void:
-	velocity = Vector2.ZERO   
-	moving = false            
-	global_position = new_pos 
+	global_position = new_pos
+	input_locked = true
+	await get_tree().process_frame 
+	input_locked = false
