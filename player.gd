@@ -1,17 +1,19 @@
 extends CharacterBody2D
 
-var moving = false
-var direction
-var input_locked := false
+var direction : Vector2i
+var moving := false
+var can_move := true
 
 var path_layer : TileMapLayer
 var wall_layer : TileMapLayer
 var forced_layer : TileMapLayer
 var sign_layer: TileMapLayer
+
 var current_cell
 var target_cell
-var can_move = true
+
 signal read_sign()
+
 
 func _ready() -> void:
 	path_layer = get_node("../TileMap/PathLayer")
@@ -19,34 +21,33 @@ func _ready() -> void:
 	forced_layer = get_node("../TileMap/ForcedLayer")
 	sign_layer = get_node("../TileMap/SignIDLayer")
 
-func _process(delta: float) -> void:
-	if input_locked:
-		return   
+
+func _process(delta: float) -> void: 
 	direction = Vector2i.ZERO
 	current_cell = wall_layer.local_to_map(position)
 	
 	var sign_cell_data = sign_layer.get_cell_tile_data(current_cell)
 	
 	if can_move:
-		if Input.is_action_pressed("ui_right"):
+		if Input.is_action_pressed("move_right"):
 			direction = Vector2i.RIGHT
 			move("side")
-		elif Input.is_action_pressed("ui_left"):
+		elif Input.is_action_pressed("move_left"):
 			direction = Vector2i.LEFT
 			move("side")
-		elif Input.is_action_pressed("ui_down"):
+		elif Input.is_action_pressed("move_down"):
 			direction = Vector2i.DOWN
 			move("down")
-		elif Input.is_action_pressed("ui_up"):
+		elif Input.is_action_pressed("move_up"):
 			direction = Vector2i.UP
 			move("up")
 	
-	if Input.is_action_just_pressed("ui_accept") and moving == false:
-		if sign_cell_data:
+	if Input.is_action_just_pressed("interact") and moving == false:
+		if sign_cell_data: 
 			var sign_id = sign_cell_data.get_custom_data("sign_id")
 			read_sign.emit(sign_id)
-			can_move=not can_move
-	
+			can_move = false
+			
 	
 func stop_moving():
 	moving = false
@@ -68,6 +69,7 @@ func stop_moving():
 			Input.is_action_pressed("ui_up")):
 		$AnimatedSprite2D.stop()
 
+
 func move(sprite_type):
 	var target_cell = current_cell + direction
 	if not moving:
@@ -82,10 +84,12 @@ func move(sprite_type):
 			tween.tween_callback(stop_moving)
 		elif (not can_move_to(target_cell)):
 			$AnimatedSprite2D.stop()	
+
 		
 func can_move_to(cell):
 	var cell_id = wall_layer.get_cell_source_id(cell)
 	return cell_id == -1
+
 
 func vector_to_animation_sprite(vec):
 	if vec==Vector2i.RIGHT or vec ==Vector2i.LEFT:	
@@ -94,11 +98,17 @@ func vector_to_animation_sprite(vec):
 		return("down")
 	elif vec == Vector2i.UP:
 		return("up")
-	else:
-		pass
+
 
 func teleport_to(new_pos: Vector2) -> void:
-	global_position = new_pos
-	input_locked = true
+	var teleport_cell = wall_layer.local_to_map(new_pos)
+	
+	global_position = wall_layer.map_to_local(teleport_cell)
+	can_move = false
 	await get_tree().process_frame 
-	input_locked = false
+	can_move = true
+
+
+func _on_message_close_sign() -> void:
+	await get_tree().process_frame   
+	can_move = true

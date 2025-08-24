@@ -1,30 +1,23 @@
 extends Label
 
+var sign_texts := {
+	1: "Game Tip: Those arrows move you!",
+	2: "That chest is purely ornamental.",
+	3: "I love computer science (lie)",
+	4: "I'm running out of ideas"
+}
 
-# Called when the node enters the scene tree for the first time.
+signal close_sign()
+
+
 func _ready() -> void:
-	pass # Replace with function body.
+	hide()
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-var can_show = false
-func _on_player_read_sign(id) -> void:
-	can_show = not can_show
-	if can_show:
-		if id == 1:
-			text = "Game Tip: Those arrows move you!"
-			show()
-		if id == 2:
-			text = "That chest is purely ornamental."
-			show()
-		if id == 3:
-			text = "I love computer science (lie)"
-			show()
-		if id == 4:
-			text = "I'm running out of ideas"
-			show()
-	else:
+func _on_player_read_sign(id: int) -> void:
+	if is_visible():
 		hide()
+		emit_signal("close_sign")
+	else:
+		text = sign_texts.get(id)
+		show()
